@@ -1,4 +1,9 @@
 /* FRONTEND LAYER */
+.page-body {
+	background-color: #343a40;
+	color: #fff;
+}
+
 @media (max-width: 420px) {
 	.navigation .nav-link {
 		padding-right: 0.25rem;
