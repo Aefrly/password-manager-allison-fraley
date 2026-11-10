@@ -1,0 +1,7 @@
+@media (max-width: 420px) {
+	.navigation .nav-link {
+		padding-right: 0.25rem;
+		padding-left: 0.25rem;
+		font-size: 0.875rem;
+	}
+}
