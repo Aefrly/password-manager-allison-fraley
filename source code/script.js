@@ -5,7 +5,6 @@ const websiteNameInput = document.getElementById("website-name");
 const websiteUrlInput = document.getElementById("website-url");
 const websiteLinks = document.getElementById("website-links");
 const websiteFormStatus = document.getElementById("website-form-status");
-const submitWebsiteButton = addWebsiteForm.querySelector('button[type="submit"]');
 
 function renderWebsiteLink(website) {
     const websiteLink = document.createElement("a");
@@ -19,7 +18,6 @@ function renderWebsiteLink(website) {
 
 addWebsiteButton.addEventListener("click", () => {
     addWebsiteForm.hidden = !addWebsiteForm.hidden;
-    addWebsiteButton.setAttribute("aria-expanded", String(!addWebsiteForm.hidden));
 
     if (!addWebsiteForm.hidden) {
         websiteNameInput.focus();
@@ -33,9 +31,6 @@ addWebsiteForm.addEventListener("submit", async (event) => {
         return;
     }
 
-    websiteFormStatus.textContent = "Saving website...";
-    submitWebsiteButton.disabled = true;
-
     try {
         const website = await apiService.createWebsite({
             name: websiteNameInput.value,
@@ -45,11 +40,8 @@ addWebsiteForm.addEventListener("submit", async (event) => {
         websiteFormStatus.textContent = `${website.name} was saved.`;
         addWebsiteForm.reset();
         addWebsiteForm.hidden = true;
-        addWebsiteButton.setAttribute("aria-expanded", "false");
     } catch (error) {
         websiteFormStatus.textContent = `Unable to save website: ${error.message}`;
-    } finally {
-        submitWebsiteButton.disabled = false;
     }
 });
 
