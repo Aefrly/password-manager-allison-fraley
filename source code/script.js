@@ -1,4 +1,5 @@
 //FRONTEND LAYER
+//selecting page elements from HTML 
 const addWebsiteButton = document.getElementById("show-add-website-form");
 const addWebsiteForm = document.getElementById("add-website-form");
 const websiteNameInput = document.getElementById("website-name");
@@ -6,6 +7,7 @@ const websiteUrlInput = document.getElementById("website-url");
 const websiteLinks = document.getElementById("website-links");
 const websiteFormStatus = document.getElementById("website-form-status");
 
+//display website link on the page
 function renderWebsiteLink(website) {
     const websiteLink = document.createElement("a");
     websiteLink.className = "btn btn-primary m-1";
@@ -16,6 +18,7 @@ function renderWebsiteLink(website) {
     websiteLinks.append(websiteLink);
 }
 
+//event listener for the add website button
 addWebsiteButton.addEventListener("click", () => {
     addWebsiteForm.hidden = !addWebsiteForm.hidden;
 
@@ -24,6 +27,7 @@ addWebsiteButton.addEventListener("click", () => {
     }
 });
 
+//event listener for the form submission
 addWebsiteForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -45,6 +49,7 @@ addWebsiteForm.addEventListener("submit", async (event) => {
     }
 });
 
+//fetch and display saved websites on page load
 apiService.fetchWebsites()
     .then((websites) => websites.forEach(renderWebsiteLink))
     .catch((error) => {
