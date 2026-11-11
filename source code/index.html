@@ -31,8 +31,26 @@
             <div class="hero-content card border-0 bg-transparent text-white mx-auto">
                 <div class="card-body text-center">
                     <!-- beginning part of website to open to new tabs -->
-                    <h2 class="card-title text-white">What website do you want to visit today?</h2>
-                    <a class="btn btn-primary mt-3" href="https://www.google.com" target="_blank" rel="noopener noreferrer">Open Google</a>
+                    <div class="d-flex justify-content-center align-items-center flex-wrap gap-3">
+                        <h2 class="card-title text-white mb-0">What website do you want to visit today?</h2>
+                        <button class="btn btn-outline-light" id="show-add-website-form" type="button">Add new website</button>
+                    </div>
+                    <div class="mt-4">
+                        <a class="btn btn-primary m-1" href="https://www.google.com" target="_blank" rel="noopener noreferrer">Open Google</a>
+                        <div id="website-links" class="d-inline"></div>
+                    </div>
+                    <form id="add-website-form" class="add-website-form mx-auto mt-4 text-start" hidden>
+                        <div class="mb-3">
+                            <label class="form-label" for="website-name">Website name</label>
+                            <input class="form-control" id="website-name" name="websiteName" type="text" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="website-url">Website URL</label>
+                            <input class="form-control" id="website-url" name="websiteUrl" type="url" placeholder="https://example.com" required>
+                        </div>
+                        <button class="btn btn-success" type="submit">Submit</button>
+                    </form>
+                    <p id="website-form-status" class="mt-3 mb-0" role="status"></p>
                 </div>
             </div>
         </section>
@@ -58,5 +76,6 @@
         <p class="mb-0">OpenSesame</p>
     </footer>
     <!-- Link to my JavaScript files -->
+    <script src="api-service.js"></script>
     <script src="script.js"></script>
 </body>

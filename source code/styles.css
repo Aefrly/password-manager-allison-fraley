@@ -4,6 +4,10 @@
 	color: #fff;
 }
 
+.add-website-form {
+	max-width: 32rem;
+}
+
 @media (max-width: 420px) {
 	.navigation .nav-link {
 		padding-right: 0.25rem;
