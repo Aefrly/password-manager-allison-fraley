@@ -1,6 +1,6 @@
 //BACKEND LAYER
 //base address for the API
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "http://127.0.0.1:3000/api";
 
 // fetches saved websites from the API
 async function fetchWebsites() {

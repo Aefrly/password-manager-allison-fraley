@@ -29,7 +29,7 @@ describe("API service", () => {
         });
 
         await expect(fetchWebsites()).resolves.toEqual(websites);
-        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/websites");
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/websites");
     });
 
     test("fetches credentials from the API", async () => {
@@ -46,7 +46,7 @@ describe("API service", () => {
         });
 
         await expect(fetchCredentials()).resolves.toEqual(credentials);
-        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/credentials");
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/credentials");
     });
 
     test("rejects unsuccessful credential fetch responses", async () => {
@@ -68,7 +68,7 @@ describe("API service", () => {
             name: " Example ",
             url: "https://example.com"
         })).resolves.toEqual(savedWebsite);
-        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/websites", {
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/websites", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -90,7 +90,7 @@ describe("API service", () => {
             username: " user@example.com ",
             password: "secret"
         })).resolves.toEqual(savedCredential);
-        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/credentials", {
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/credentials", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

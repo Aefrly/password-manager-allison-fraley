@@ -1,12 +1,41 @@
 const path = require("node:path");
+const fs = require("node:fs");
 const express = require("express");
 const { sequelize, Website, Credential } = require("./models");
 const { createApiRouter, getEncryptionKey } = require("./api-routes");
 
 const HOST = "127.0.0.1";
 const PORT = Number(process.env.PORT || 3000);
+const ENV_FILE = path.join(__dirname, "..", "documentation", ".env");
+
+function loadEnvironmentFile(filePath) {
+    if (!fs.existsSync(filePath)) {
+        return;
+    }
+
+    const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/);
+    lines.forEach((line) => {
+        const match = line.match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+        if (!match || process.env[match[1]] !== undefined) {
+            return;
+        }
+
+        let value = match[2];
+        if (
+            value.length >= 2 &&
+            ((value.startsWith("\"") && value.endsWith("\"")) ||
+                (value.startsWith("'") && value.endsWith("'")))
+        ) {
+            value = value.slice(1, -1);
+        } else {
+            value = value.replace(/\s+#.*$/, "");
+        }
+        process.env[match[1]] = value;
+    });
+}
 
 async function startServer() {
+    loadEnvironmentFile(ENV_FILE);
     const encryptionKey = getEncryptionKey();
     await sequelize.authenticate();
     await sequelize.sync();
