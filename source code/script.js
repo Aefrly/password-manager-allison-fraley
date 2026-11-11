@@ -50,8 +50,7 @@ addWebsiteForm.addEventListener("submit", async (event) => {
 });
 
 //fetch and display saved websites on page load
+//saved websites are optional when the API is unavailable.
 apiService.fetchWebsites()
     .then((websites) => websites.forEach(renderWebsiteLink))
-    .catch((error) => {
-        websiteFormStatus.textContent = `Unable to load saved websites: ${error.message}`;
-    });
+    .catch(() => {});
