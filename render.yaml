@@ -2,7 +2,7 @@ services:
   - type: web
     name: opensesame
     runtime: node
-    buildCommand: npm ci
+    buildCommand: npm ci --build-from-source
     startCommand: npm start
     healthCheckPath: /api/websites
     envVars:

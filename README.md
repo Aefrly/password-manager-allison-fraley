@@ -122,7 +122,7 @@ The API has no authentication. In particular, `GET /credentials` returns plainte
 
 ## Deploying on Render
 
-The root `render.yaml` configures a Node web service. In Render, create a **Blueprint** from this repository and apply the `opensesame` service. The Blueprint installs dependencies with `npm ci`, starts the app with `npm start`, binds it to Render's network interface, and generates `CREDENTIALS_ENCRYPTION_KEY`.
+The root `render.yaml` configures a Node web service. In Render, create a **Blueprint** from this repository and apply the `opensesame` service. The Blueprint installs dependencies with `npm ci --build-from-source` so SQLite is compiled for Render's Linux environment, starts the app with `npm start`, binds it to Render's network interface, and generates `CREDENTIALS_ENCRYPTION_KEY`. If configuring the web service manually, use the same build command.
 
 The generated key must remain unchanged to decrypt existing records. The default Render filesystem is ephemeral, so saved data is not durable. These deployment defaults are for a disposable demo only—not for real passwords.
 
