@@ -135,8 +135,7 @@ function renderCredentialPrompt(website) {
                 username: usernameInput.value,
                 password: passwordInput.value
             }, website.name);
-            status.textContent = `Information saved for ${website.name}.`;
-            form.reset();
+            prompt.remove();
         } catch (error) {
             status.textContent = `Unable to save information: ${error.message}`;
         } finally {
