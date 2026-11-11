@@ -1,7 +1,12 @@
 //import functions from api-service.js
-const { fetchWebsites, createWebsite } = require("../source code/api-service.js");
+const {
+    fetchWebsites,
+    fetchCredentials,
+    createWebsite,
+    createCredential
+} = require("../source code/api-service.js");
 
-describe("website API service", () => {
+describe("API service", () => {
     const originalFetch = global.fetch;
 
     //mock function to simulate fetch behavior
@@ -24,7 +29,31 @@ describe("website API service", () => {
         });
 
         await expect(fetchWebsites()).resolves.toEqual(websites);
-        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/websites");
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/websites");
+    });
+
+    test("fetches credentials from the API", async () => {
+        const credentials = [{
+            id: 1,
+            websiteId: 1,
+            websiteName: "Example",
+            username: "user@example.com",
+            password: "secret"
+        }];
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: jest.fn().mockResolvedValue(credentials)
+        });
+
+        await expect(fetchCredentials()).resolves.toEqual(credentials);
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/credentials");
+    });
+
+    test("rejects unsuccessful credential fetch responses", async () => {
+        jest.spyOn(console, "error").mockImplementation(() => {});
+        global.fetch.mockResolvedValue({ ok: false });
+
+        await expect(fetchCredentials()).rejects.toThrow("Failed to fetch credentials");
     });
 
     //tests to create a website through the API
@@ -39,7 +68,7 @@ describe("website API service", () => {
             name: " Example ",
             url: "https://example.com"
         })).resolves.toEqual(savedWebsite);
-        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/websites", {
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/websites", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -47,6 +76,51 @@ describe("website API service", () => {
                 url: "https://example.com/"
             })
         });
+    });
+
+    test("creates credentials through the API", async () => {
+        const savedCredential = { id: 1, websiteId: 1, username: "user@example.com" };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: jest.fn().mockResolvedValue(savedCredential)
+        });
+
+        await expect(createCredential({
+            websiteId: 1,
+            username: " user@example.com ",
+            password: "secret"
+        })).resolves.toEqual(savedCredential);
+        expect(global.fetch).toHaveBeenCalledWith("http://127.0.0.1:3000/api/credentials", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                websiteId: 1,
+                username: "user@example.com",
+                password: "secret"
+            })
+        });
+    });
+
+    test("rejects unsuccessful credential API responses", async () => {
+        jest.spyOn(console, "error").mockImplementation(() => {});
+        global.fetch.mockResolvedValue({ ok: false });
+
+        await expect(createCredential({
+            websiteId: 1,
+            username: "user@example.com",
+            password: "secret"
+        })).rejects.toThrow("Failed to save credentials");
+    });
+
+    test("rejects missing credential data without sending a request", async () => {
+        jest.spyOn(console, "error").mockImplementation(() => {});
+
+        await expect(createCredential({
+            websiteId: 1,
+            username: " ",
+            password: "secret"
+        })).rejects.toThrow("Username or email is required");
+        expect(global.fetch).not.toHaveBeenCalled();
     });
 
     //tests to handle unsuccessful API responses
