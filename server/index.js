@@ -4,7 +4,7 @@ const express = require("express");
 const { sequelize, Website, Credential } = require("./models");
 const { createApiRouter, getEncryptionKey } = require("./api-routes");
 
-const HOST = "127.0.0.1";
+const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 3000);
 const ENV_FILE = path.join(__dirname, "..", "documentation", ".env");
 

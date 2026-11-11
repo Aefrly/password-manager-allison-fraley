@@ -6,7 +6,7 @@ OpenSesame is a locally hosted password manager for saving website links and the
 
 ## Project status
 
-- **Live deployment:** None configured. After setup, open [http://127.0.0.1:3000](http://127.0.0.1:3000).
+- **Deployment:** A Render web-service configuration is provided in `render.yaml`. The app is a demo only; do not enter real credentials.
 - **Repository:** [Aefrly/password-manager-allison-fraley](https://github.com/Aefrly/password-manager-allison-fraley)
 
 ## What it does
@@ -91,8 +91,8 @@ SQLite database
 | --- | --- |
 | `source code/index.html` and `styles.css` | Page structure and styling. Bootstrap CSS is loaded from jsDelivr. |
 | `source code/script.js` | Form interactions and rendering website links and credential cards. |
-| `source code/api-service.js` | Centralizes browser requests to the API at `http://127.0.0.1:3000/api`. |
-| `server/index.js` | Reads the local environment file, initializes Sequelize, starts Express, and serves the frontend and API. |
+| `source code/api-service.js` | Centralizes browser requests to the same-origin `/api` endpoints. |
+| `server/index.js` | Reads the local environment file, initializes Sequelize, starts Express, and serves the frontend and API. The host and port can be configured through `HOST` and `PORT`. |
 | `server/api-routes.js` | Validates website and credential requests and encrypts/decrypts passwords. |
 | `server/models.js` | Defines the Sequelize `Website` and `Credential` models and their one-to-many relationship. |
 | `tests/` | Jest tests for API-service behavior using mocked `fetch` calls. |
@@ -104,12 +104,12 @@ SQLite database
 - **Relational model:** Each credential belongs to one website; a website can have multiple credentials.
 - **Local-first storage:** SQLite keeps setup simple and avoids requiring an external database service.
 - **Authenticated encryption at rest:** Each password uses AES-256-GCM with a fresh random 12-byte IV and an authentication tag. The key is supplied through `CREDENTIALS_ENCRYPTION_KEY`, not stored in the database.
-- **Same-origin local serving:** Express serves both the frontend and API. The server binds to `127.0.0.1`; this keeps the app local but does not replace API authentication.
+- **Same-origin serving:** Express serves both the frontend and API, and the browser uses relative API paths so it works behind a hosted domain as well as locally. The server binds to `127.0.0.1` by default; Render sets `HOST=0.0.0.0`.
 - **Safe text rendering:** User-entered names and usernames are rendered as text rather than HTML.
 
 ## API
 
-Base URL: `http://127.0.0.1:3000/api`
+Base URL: `/api` on the same origin as the app (locally, `http://127.0.0.1:3000/api`).
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
@@ -118,7 +118,13 @@ Base URL: `http://127.0.0.1:3000/api`
 | `GET` | `/credentials` | Return saved credentials, including decrypted passwords. |
 | `POST` | `/credentials` | Create a credential. Body: `{"websiteId":1,"username":"name","password":"secret"}` |
 
-The API has no authentication. In particular, `GET /credentials` returns plaintext passwords to its caller. The loopback-only server binding is intentional; do not expose the app to a network without first implementing and reviewing authentication and transport security.
+The API has no authentication. In particular, `GET /credentials` returns plaintext passwords to its caller. **Do not use the Render deployment with real or sensitive credentials.** It is an unauthenticated public demo; implementing and reviewing authentication and transport security is required before using it for private data. Render's local filesystem is also ephemeral by default, so data may not persist across restarts or redeploys.
+
+## Deploying on Render
+
+The root `render.yaml` configures a Node web service. In Render, create a **Blueprint** from this repository and apply the `opensesame` service. The Blueprint installs dependencies with `npm ci`, starts the app with `npm start`, binds it to Render's network interface, and generates `CREDENTIALS_ENCRYPTION_KEY`.
+
+The generated key must remain unchanged to decrypt existing records. The default Render filesystem is ephemeral, so saved data is not durable. These deployment defaults are for a disposable demo only—not for real passwords.
 
 ## Tests
 
@@ -133,8 +139,8 @@ npm test
 | Problem | What to check |
 | --- | --- |
 | Invalid or missing encryption key | Set `CREDENTIALS_ENCRYPTION_KEY` in `documentation/.env`. It must be exactly 64 hexadecimal characters. Restart the server after changing it. |
-| Page loads but data does not | Make sure `node server/index.js` is still running and visit `http://127.0.0.1:3000` (not `localhost` or a `file://` URL). Check the browser console and server terminal. |
-| Port is already in use | Stop the other process using port 3000. The frontend API URL is hard-coded to this port, so changing only the server's `PORT` will break API requests. |
+| Page loads but data does not | Make sure the server is running and open the page from that server (not a `file://` URL). Check the browser console and server terminal. |
+| Port is already in use | Stop the other process using the selected port or set `PORT` to an available port. |
 | Dependency or SQLite install fails | Use Node.js 20.17.0 or later and run `npm ci`. If a native prebuilt package is unavailable, install your platform's compiler/build tools. |
 | Bootstrap styling is missing | The Bootstrap stylesheet comes from jsDelivr; check network access. The project's own `styles.css` is served locally. |
 
@@ -143,8 +149,8 @@ npm test
 - No user accounts, sign-in, authorization, or master-password workflow.
 - Credentials cannot currently be edited or deleted through the interface.
 - The encryption key has no built-in rotation or recovery mechanism.
-- The frontend API URL is fixed to `127.0.0.1:3000`.
-- SQLite and the local-only server are intended for a single-user demo, not shared or concurrent hosting.
+- The API has no authentication, so it is unsafe for shared hosting or real credentials.
+- SQLite on Render's default filesystem is ephemeral; hosted data is not durable without configuring persistent storage.
 - Bootstrap depends on a third-party CDN.
 - No production deployment or application screenshots are currently provided.
 

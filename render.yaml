@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: opensesame
+    runtime: node
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/websites
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: CREDENTIALS_ENCRYPTION_KEY
+        generateValue: true
