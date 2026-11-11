@@ -2,8 +2,6 @@
 
 OpenSesame is a locally hosted password manager for saving website links and their associated usernames and passwords. Website and credential data is stored in SQLite; passwords are encrypted at rest using AES-256-GCM.
 
-> **Use for local development and demonstration only.** The app has no user authentication, and its API can return decrypted passwords. Do not expose it to the internet or use it for real secrets.
-
 ## Project status
 
 - **Deployment:** A Render web-service configuration is provided in `render.yaml`. The app is a demo only; do not enter real credentials.
@@ -119,12 +117,6 @@ Base URL: `/api` on the same origin as the app (locally, `http://127.0.0.1:3000/
 | `POST` | `/credentials` | Create a credential. Body: `{"websiteId":1,"username":"name","password":"secret"}` |
 
 The API has no authentication. In particular, `GET /credentials` returns plaintext passwords to its caller. **Do not use the Render deployment with real or sensitive credentials.** It is an unauthenticated public demo; implementing and reviewing authentication and transport security is required before using it for private data. Render's local filesystem is also ephemeral by default, so data may not persist across restarts or redeploys.
-
-## Deploying on Render
-
-The root `render.yaml` configures a Node web service. In Render, create a **Blueprint** from this repository and apply the `opensesame` service. The Blueprint installs dependencies with `npm ci --build-from-source` so SQLite is compiled for Render's Linux environment, starts the app with `npm start`, binds it to Render's network interface, and generates `CREDENTIALS_ENCRYPTION_KEY`. If configuring the web service manually, use the same build command.
-
-The generated key must remain unchanged to decrypt existing records. The default Render filesystem is ephemeral, so saved data is not durable. These deployment defaults are for a disposable demo only—not for real passwords.
 
 ## Tests
 
