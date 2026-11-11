@@ -1,65 +1,60 @@
-const assert = require("node:assert/strict");
-const test = require("node:test");
 const { fetchWebsites, createWebsite } = require("../source code/api-service.js");
 
-test("fetches websites from the API", async () => {
+describe("website API service", () => {
     const originalFetch = global.fetch;
-    const websites = [{ id: 1, name: "Example", url: "https://example.com/" }];
-    let requestUrl;
 
-    global.fetch = async (url) => {
-        requestUrl = url;
-        return { ok: true, json: async () => websites };
-    };
+    beforeEach(() => {
+        global.fetch = jest.fn();
+    });
 
-    try {
-        assert.deepEqual(await fetchWebsites(), websites);
-        assert.equal(requestUrl, "http://localhost:3000/api/websites");
-    } finally {
+    afterEach(() => {
+        jest.restoreAllMocks();
         global.fetch = originalFetch;
-    }
-});
+    });
 
-test("creates a website through the API", async () => {
-    const originalFetch = global.fetch;
-    const savedWebsite = { id: 1, name: "Example", url: "https://example.com/" };
-    let requestUrl;
-    let requestOptions;
+    test("fetches websites from the API", async () => {
+        const websites = [{ id: 1, name: "Example", url: "https://example.com/" }];
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: jest.fn().mockResolvedValue(websites)
+        });
 
-    global.fetch = async (url, options) => {
-        requestUrl = url;
-        requestOptions = options;
-        return { ok: true, json: async () => savedWebsite };
-    };
+        await expect(fetchWebsites()).resolves.toEqual(websites);
+        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/websites");
+    });
 
-    try {
-        assert.deepEqual(await createWebsite({
+    test("creates a website through the API", async () => {
+        const savedWebsite = { id: 1, name: "Example", url: "https://example.com/" };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: jest.fn().mockResolvedValue(savedWebsite)
+        });
+
+        await expect(createWebsite({
             name: " Example ",
             url: "https://example.com"
-        }), savedWebsite);
-        assert.equal(requestUrl, "http://localhost:3000/api/websites");
-        assert.equal(requestOptions.method, "POST");
-        assert.equal(requestOptions.headers["Content-Type"], "application/json");
-        assert.deepEqual(JSON.parse(requestOptions.body), {
-            name: "Example",
-            url: "https://example.com/"
+        })).resolves.toEqual(savedWebsite);
+        expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000/api/websites", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: "Example",
+                url: "https://example.com/"
+            })
         });
-    } finally {
-        global.fetch = originalFetch;
-    }
-});
+    });
 
-test("rejects unsuccessful API responses and non-web URLs", async () => {
-    const originalFetch = global.fetch;
-    global.fetch = async () => ({ ok: false });
+    test("rejects unsuccessful API responses", async () => {
+        jest.spyOn(console, "error").mockImplementation(() => {});
+        global.fetch.mockResolvedValue({ ok: false });
 
-    try {
-        await assert.rejects(fetchWebsites(), /Failed to fetch websites/);
-        await assert.rejects(
-            createWebsite({ name: "Example", url: "javascript:alert(1)" }),
-            /Website URL must begin with http:\/\/ or https:\/\//
-        );
-    } finally {
-        global.fetch = originalFetch;
-    }
+        await expect(fetchWebsites()).rejects.toThrow("Failed to fetch websites");
+    });
+
+    test("rejects non-web URLs without sending a request", async () => {
+        await expect(
+            createWebsite({ name: "Example", url: "javascript:alert(1)" })
+        ).rejects.toThrow("Website URL must begin with http:// or https://");
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
 });
