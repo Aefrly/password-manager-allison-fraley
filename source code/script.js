@@ -21,6 +21,7 @@ function renderWebsiteLink(website) {
     websiteLinks.append(websiteLink);
 }
 
+//display credential card on the page
 function renderCredentialCard(credential, websiteName) {
     if (
         !credential ||
@@ -71,6 +72,7 @@ function renderCredentialCard(credential, websiteName) {
     savedCredentials.append(card);
 }
 
+//display credential prompt on the page
 function renderCredentialPrompt(website) {
     const prompt = document.createElement("article");
     prompt.className = "credential-prompt card text-dark";
@@ -180,6 +182,7 @@ addWebsiteForm.addEventListener("submit", async (event) => {
     }
 });
 
+// Loads saved websites and credentials from the server and renders them on the page
 async function loadSavedInformation() {
     let websites = [];
     try {

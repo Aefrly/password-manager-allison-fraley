@@ -8,6 +8,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 3000);
 const ENV_FILE = path.join(__dirname, "..", "documentation", ".env");
 
+// Loads environment variables from the .env file
 function loadEnvironmentFile(filePath) {
     if (!fs.existsSync(filePath)) {
         return;
@@ -34,6 +35,7 @@ function loadEnvironmentFile(filePath) {
     });
 }
 
+// Starts the Express server, loading environment variables, authenticating the database, and setting up routes
 async function startServer() {
     loadEnvironmentFile(ENV_FILE);
     const encryptionKey = getEncryptionKey();

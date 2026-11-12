@@ -2,12 +2,14 @@
 const path = require("node:path");
 const { Sequelize, DataTypes } = require("sequelize");
 
+// Initializes a Sequelize instance for SQLite
 const sequelize = new Sequelize({
     dialect: "sqlite",
     storage: path.join(__dirname, "password-manager.sqlite"),
     logging: false
 });
 
+// Defines the Website model with name and URL fields
 const Website = sequelize.define("Website", {
     name: {
         type: DataTypes.STRING,
@@ -20,6 +22,7 @@ const Website = sequelize.define("Website", {
     }
 });
 
+// Defines the Credential model with username and encrypted password fields
 const Credential = sequelize.define("Credential", {
     username: {
         type: DataTypes.STRING,
@@ -40,6 +43,7 @@ const Credential = sequelize.define("Credential", {
     }
 });
 
+// Setting up table relationships
 Website.hasMany(Credential, {
     as: "credentials",
     foreignKey: { name: "websiteId", allowNull: false },

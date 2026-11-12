@@ -8,6 +8,7 @@ function getEncryptionKey(value = process.env.CREDENTIALS_ENCRYPTION_KEY) {
     return Buffer.from(value, "hex");
 }
 
+// Encrypts a password using AES-256-GCM 
 function encryptPassword(password, key) {
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
@@ -23,6 +24,7 @@ function encryptPassword(password, key) {
     };
 }
 
+// Decrypts a password using AES-256-GCM
 function decryptPassword(credential, key) {
     const decipher = crypto.createDecipheriv(
         "aes-256-gcm",
@@ -36,6 +38,7 @@ function decryptPassword(credential, key) {
     ]).toString("utf8");
 }
 
+// Creates an Express router for the API routes, using the provided models and encryption key
 function createApiRouter({ Website, Credential, encryptionKey }) {
     if (!Website || !Credential) {
         throw new Error("Website and Credential models are required");

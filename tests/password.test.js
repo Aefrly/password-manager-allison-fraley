@@ -32,6 +32,7 @@ describe("API service", () => {
         expect(global.fetch).toHaveBeenCalledWith("/api/websites");
     });
 
+    //tests to handle unsuccessful website fetch responses
     test("fetches credentials from the API", async () => {
         const credentials = [{
             id: 1,
@@ -49,6 +50,7 @@ describe("API service", () => {
         expect(global.fetch).toHaveBeenCalledWith("/api/credentials");
     });
 
+    //tests to handle unsuccessful credential fetch responses
     test("rejects unsuccessful credential fetch responses", async () => {
         jest.spyOn(console, "error").mockImplementation(() => {});
         global.fetch.mockResolvedValue({ ok: false });
@@ -78,6 +80,7 @@ describe("API service", () => {
         });
     });
 
+    //tests to handle unsuccessful website creation responses
     test("creates credentials through the API", async () => {
         const savedCredential = { id: 1, websiteId: 1, username: "user@example.com" };
         global.fetch.mockResolvedValue({
@@ -101,6 +104,7 @@ describe("API service", () => {
         });
     });
 
+    //tests to handle unsuccessful credential creation responses
     test("rejects unsuccessful credential API responses", async () => {
         jest.spyOn(console, "error").mockImplementation(() => {});
         global.fetch.mockResolvedValue({ ok: false });
@@ -112,6 +116,7 @@ describe("API service", () => {
         })).rejects.toThrow("Failed to save credentials");
     });
 
+    //tests to handle missing credential data without sending a request
     test("rejects missing credential data without sending a request", async () => {
         jest.spyOn(console, "error").mockImplementation(() => {});
 
